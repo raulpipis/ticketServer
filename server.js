@@ -114,6 +114,9 @@ function startServer() {
             case 'GET':
                 handleGetRequest(req, res);
                 break;
+            case 'DELETE':
+                handleDeleteRequest(req, res);
+                break;
             default:
                 res.writeHead(405, {'Content-Type': 'text/html'});
                 res.end('405 Method Not Allowed');
@@ -209,6 +212,21 @@ function handlePostRequest(req, res) {
             break;
         }
     });
+}
+
+function handleDeleteRequest(req, res) {
+    var parsedUrl = url.parse(req.url);
+    var queryData = parsedUrl.query;
+    switch(parsedUrl.pathname) {
+    case '/api/deleteEvent':
+        deleteEvent(queryData.id, res);
+        break;
+    default:
+        console.log("Unknown DELETE url " + parsedUrl.pathname);
+        res.writeHead(404, {'Content-Type': 'text/html'});
+        res.end("404 Not Found");
+        break;
+    }
 }
 
 function addOrganizer(postData, res) {
@@ -378,6 +396,149 @@ function buyTicket(postData, res) {
                 res.end();
             });
         });
+    }).catch(function(err) {
+        console.log(err);
+        res.writeHead(500, {'Content-Type': 'text/html'});
+        res.write(err);
+        res.end();
+    });
+}
+
+function getOrganizerEvents(orgId, res) {
+    var orgColl = db[orgCollName];
+    orgColl.findOne().where('_id').eq(orgId).exec().then(async function(document) {
+        if (document) {
+            var orgEvents = await document.populate('events');
+            var response = [];
+            for (var index in orgEvents) {
+                var eventData = orgEvents[index]._dataSync$._value;
+                var event = {
+                    'eventId' : eventData._id,
+                    'name' : eventData.name,
+                    'price' : eventData.price,
+                    'location' : eventData.location,
+                    'ticketsAvailable' : eventData.maxTickets - eventData.soldTickets,
+                    'ticketsSold' : eventData.soldTickets,
+                    'descrption' : eventData.description
+                };
+                response.push(event);
+            }
+            res.writeHead(200, {'Content-Type' : 'application/json'});
+            res.write(JSON.stringify(response));
+            res.end();
+        } else {
+            res.writeHead(404, {'Content-Type': 'text/html'});
+            res.end("404 Not Found event: " + postData.eventId);
+        }
+    }).catch(function(err) {
+        console.log(err);
+        res.writeHead(500, {'Content-Type': 'text/html'});
+        res.write(err);
+        res.end();
+    });
+}
+
+function getClientEvents(clientId, res) {
+    var cliColl = db[cliCollName];
+    cliColl.findOne().where('_id').eq(clientId).exec().then(async function(document) {
+        if (document) {
+            var cliEvents = await document.populate('events');
+            var response = [];
+            for (var index in cliEvents) {
+                var eventData = cliEvents[index]._dataSync$._value;
+                var event = {
+                    'eventId' : eventData._id,
+                    'name' : eventData.name,
+                    'price' : eventData.price,
+                    'location' : eventData.location,
+                    'descrption' : eventData.description
+                };
+                response.push(event);
+            }
+            res.writeHead(200, {'Content-Type' : 'application/json'});
+            res.write(JSON.stringify(response));
+            res.end();
+        } else {
+            res.writeHead(404, {'Content-Type': 'text/html'});
+            res.end("404 Not Found event: " + postData.eventId);
+        }
+    }).catch(function(err) {
+        console.log(err);
+        res.writeHead(500, {'Content-Type': 'text/html'});
+        res.write(err);
+        res.end();
+    });
+}
+
+function getEvent(eventId, res) {
+    var eventColl = db[eventsCollName];
+    eventColl.findOne().where('_id').eq(eventId).exec().then(function(document){
+        if (document) {
+            var eventData = document._dataSync$._value;
+            var event = {
+                'eventId' : eventData._id,
+                'name' : eventData.name,
+                'price' : eventData.price,
+                'location' : eventData.location,
+                'descrption' : eventData.description
+            };
+            res.writeHead(200, {'Content-Type' : 'application/json'});
+            res.write(JSON.stringify(event));
+            res.end();
+        } else {
+            res.writeHead(404, {'Content-Type': 'text/html'});
+            res.end("404 Not Found event: " + postData.eventId);
+        }
+    }).catch(function(err) {
+        console.log(err);
+        res.writeHead(500, {'Content-Type': 'text/html'});
+        res.write(err);
+        res.end();
+    });
+}
+
+function getAllEvents(res) {
+    var eventColl = db[eventsCollName];
+    eventColl.find().exec().then(function(documents){
+        if (documents) {
+            var response = [];
+            for(var index in documents) {
+                var eventData = documents[index]._dataSync$._value;
+                var event = {
+                    'eventId' : eventData._id,
+                    'name' : eventData.name,
+                    'price' : eventData.price,
+                    'ticketsAvailable' : eventData.maxTickets - eventData.soldTickets,
+                    'location' : eventData.location,
+                    'descrption' : eventData.description
+                };
+                response.push(event);
+            }
+            res.writeHead(200, {'Content-Type' : 'application/json'});
+            res.write(JSON.stringify(response));
+            res.end();
+        } else {
+            res.writeHead(404, {'Content-Type': 'text/html'});
+            res.end("404 Not Found event: " + postData.eventId);
+        }
+    }).catch(function(err) {
+        console.log(err);
+        res.writeHead(500, {'Content-Type': 'text/html'});
+        res.write(err);
+        res.end();
+    });
+}
+
+function deleteEvent(eventId, res) {
+    var eventColl = db[eventsCollName];
+    eventColl.findOne().where('_id').eq(eventId).remove().then(function(document) {
+        res.writeHead(200, {'Content-Type' : 'application/json'});
+        if (document) {
+            res.write('Success');
+        } else {
+            res.write('Failed');
+        }
+        res.end();
     }).catch(function(err) {
         console.log(err);
         res.writeHead(500, {'Content-Type': 'text/html'});
