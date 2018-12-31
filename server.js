@@ -117,6 +117,9 @@ function startServer() {
             case 'DELETE':
                 handleDeleteRequest(req, res);
                 break;
+            case 'OPTIONS':
+                handleOptionsRequest(req, res);
+                break;
             default:
                 res.writeHead(405, {'Content-Type': 'text/html'});
                 res.end('405 Method Not Allowed');
@@ -124,6 +127,15 @@ function startServer() {
         }).listen(80);
         console.log("SERVER STARTED!!!");
     }).catch(function(err){console.log(err + " Error creating database " + dbName)});
+}
+
+function handleOptionsRequest(req, res) {
+    res.writeHead(200, {
+        'Access-Control-Allow-Origin' : '*',
+        'Access-Control-Allow-Methods' : 'GET, POST, DELETE',
+        'Access-Control-Allow-Headers' : '*'
+    });
+    res.end();
 }
 
 function handleGetRequest(req, res) {
@@ -247,7 +259,7 @@ function addUserGeneric(postData, res, coll, status) {
     coll.findOne().where('username').eq(postData.username).exec().then(function(result) {
         if (!result) {
             coll.insert(dataInsert).then(function (document) {
-                res.writeHead(200, {'Content-Type' : 'application/json'});
+                res.writeHead(200, {'Content-Type' : 'application/json', 'Access-Control-Allow-Origin' : '*'});
                 var identifier = status + 'Id';
                 var id = {};
                 id[identifier] = document._dataSync$._value._id;
@@ -282,7 +294,7 @@ function loginClient(postData, res) {
     }
     coll.findOne().where('username').eq(postData.username).where('password').eq(postData.password).exec().then(function(document) {
         if (document) {
-            res.writeHead(200, {'Content-Type' : 'application/json'});
+            res.writeHead(200, {'Content-Type' : 'application/json', 'Access-Control-Allow-Origin' : '*'});
             var identifier = status + 'Id';
             var id = {};
             id[identifier] = document._dataSync$._value._id;
@@ -319,7 +331,7 @@ function addEvent(postData, res) {
             }
         };
         orgColl.findOne().where('_id').eq(postData.organizerId).update(updateQuery).then(function(orgDocument){
-            res.writeHead(200, {'Content-Type' : 'application/json'});
+            res.writeHead(200, {'Content-Type' : 'application/json', 'Access-Control-Allow-Origin' : '*'});
             var id = {
                 'eventId' : eventId
             };
@@ -347,7 +359,7 @@ function editEvent(postData, res) {
     };
     eventColl.findOne().where('_id').eq(postData.eventId).update(updateData).then(function(document) {
         if (document) {
-            res.writeHead(200, {'Content-Type' : 'application/json'});
+            res.writeHead(200, {'Content-Type' : 'application/json', 'Access-Control-Allow-Origin' : '*'});
             var id = {
                 'eventId' : postData.eventId
             };
@@ -388,7 +400,7 @@ function buyTicket(postData, res) {
                 }
             };
             cliColl.findOne().where('_id').eq(postData.clientId).update(cliUpdate).then(function(cliDoc) {
-                res.writeHead(200, {'Content-Type' : 'application/json'});
+                res.writeHead(200, {'Content-Type' : 'application/json', 'Access-Control-Allow-Origin' : '*'});
                 var id = {
                     'eventId' : postData.eventId
                 };
@@ -423,7 +435,7 @@ function getOrganizerEvents(orgId, res) {
                 };
                 response.push(event);
             }
-            res.writeHead(200, {'Content-Type' : 'application/json'});
+            res.writeHead(200, {'Content-Type' : 'application/json', 'Access-Control-Allow-Origin' : '*'});
             res.write(JSON.stringify(response));
             res.end();
         } else {
@@ -455,7 +467,7 @@ function getClientEvents(clientId, res) {
                 };
                 response.push(event);
             }
-            res.writeHead(200, {'Content-Type' : 'application/json'});
+            res.writeHead(200, {'Content-Type' : 'application/json', 'Access-Control-Allow-Origin' : '*'});
             res.write(JSON.stringify(response));
             res.end();
         } else {
@@ -482,7 +494,7 @@ function getEvent(eventId, res) {
                 'location' : eventData.location,
                 'descrption' : eventData.description
             };
-            res.writeHead(200, {'Content-Type' : 'application/json'});
+            res.writeHead(200, {'Content-Type' : 'application/json', 'Access-Control-Allow-Origin' : '*'});
             res.write(JSON.stringify(event));
             res.end();
         } else {
@@ -514,7 +526,7 @@ function getAllEvents(res) {
                 };
                 response.push(event);
             }
-            res.writeHead(200, {'Content-Type' : 'application/json'});
+            res.writeHead(200, {'Content-Type' : 'application/json', 'Access-Control-Allow-Origin' : '*'});
             res.write(JSON.stringify(response));
             res.end();
         } else {
@@ -532,7 +544,7 @@ function getAllEvents(res) {
 function deleteEvent(eventId, res) {
     var eventColl = db[eventsCollName];
     eventColl.findOne().where('_id').eq(eventId).remove().then(function(document) {
-        res.writeHead(200, {'Content-Type' : 'application/json'});
+        res.writeHead(200, {'Content-Type' : 'application/json', 'Access-Control-Allow-Origin' : '*'});
         if (document) {
             res.write('Success');
         } else {
