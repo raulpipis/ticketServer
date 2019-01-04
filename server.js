@@ -139,7 +139,7 @@ function handleOptionsRequest(req, res) {
 }
 
 function handleGetRequest(req, res) {
-    var parsedUrl = url.parse(req.url);
+    var parsedUrl = url.parse(req.url, true);
     var parsedPath = path.parse(parsedUrl.pathname);
     /*if static resource*/
     if (parsedPath.ext || parsedUrl.pathname === '/') {
@@ -267,7 +267,7 @@ function addUserGeneric(postData, res, coll, status) {
                 res.end();
             }).catch(function(err) {
                 res.writeHead(500, {'Content-Type': 'text/html'});
-                res.write(err);
+                res.write(JSON.stringify(err));
                 res.end();
             });
         } else {
@@ -277,7 +277,7 @@ function addUserGeneric(postData, res, coll, status) {
         }
     }).catch(function(err) {
         res.writeHead(500, {'Content-Type': 'text/html'});
-        res.write(err);
+        res.write(JSON.stringify(err));
         res.end();
     });
 }
@@ -306,7 +306,7 @@ function loginClient(postData, res) {
         }
     }).catch(function(err) {
         res.writeHead(500, {'Content-Type': 'text/html'});
-        res.write(err);
+        res.write(JSON.stringify(err));
         res.end();
     });
 }
@@ -341,7 +341,7 @@ function addEvent(postData, res) {
     }).catch(function(err) {
         console.log(err);
         res.writeHead(500, {'Content-Type': 'text/html'});
-        res.write(err);
+        res.write(JSON.stringify(err));
         res.end();
     });
 }
@@ -372,7 +372,7 @@ function editEvent(postData, res) {
     }).catch(function(err) {
         console.log(err);
         res.writeHead(500, {'Content-Type': 'text/html'});
-        res.write(err);
+        res.write(JSON.stringify(err));
         res.end();
     });
 }
@@ -411,7 +411,7 @@ function buyTicket(postData, res) {
     }).catch(function(err) {
         console.log(err);
         res.writeHead(500, {'Content-Type': 'text/html'});
-        res.write(err);
+        res.write(JSON.stringify(err));
         res.end();
     });
 }
@@ -445,7 +445,7 @@ function getOrganizerEvents(orgId, res) {
     }).catch(function(err) {
         console.log(err);
         res.writeHead(500, {'Content-Type': 'text/html'});
-        res.write(err);
+        res.write(JSON.stringify(err));
         res.end();
     });
 }
@@ -477,7 +477,7 @@ function getClientEvents(clientId, res) {
     }).catch(function(err) {
         console.log(err);
         res.writeHead(500, {'Content-Type': 'text/html'});
-        res.write(err);
+        res.write(JSON.stringify(err));
         res.end();
     });
 }
@@ -504,7 +504,7 @@ function getEvent(eventId, res) {
     }).catch(function(err) {
         console.log(err);
         res.writeHead(500, {'Content-Type': 'text/html'});
-        res.write(err);
+        res.write(JSON.stringify(err));
         res.end();
     });
 }
@@ -536,7 +536,7 @@ function getAllEvents(res) {
     }).catch(function(err) {
         console.log(err);
         res.writeHead(500, {'Content-Type': 'text/html'});
-        res.write(err);
+        res.write(JSON.stringify(err));
         res.end();
     });
 }
@@ -554,7 +554,7 @@ function deleteEvent(eventId, res) {
     }).catch(function(err) {
         console.log(err);
         res.writeHead(500, {'Content-Type': 'text/html'});
-        res.write(err);
+        res.write(JSON.stringify(err));
         res.end();
     });
 }
