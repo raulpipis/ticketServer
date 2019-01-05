@@ -352,7 +352,6 @@ function editEvent(postData, res) {
         '$set' : {
             'name' : postData.name,
             'location' : postData.location,
-            'maxTickets' : parseInt(postData.ticketsNumber),
             'description' : postData.description,
             'price' : parseInt(postData.price)
         }
@@ -521,6 +520,7 @@ function getAllEvents(res) {
                     'name' : eventData.name,
                     'price' : eventData.price,
                     'ticketsAvailable' : eventData.maxTickets - eventData.soldTickets,
+                    'ticketsSold' : eventData.soldTickets,
                     'location' : eventData.location,
                     'descrption' : eventData.description
                 };
