@@ -1,4 +1,4 @@
-var https = require('https');
+var http = require('http');
 var rxdb = require('rxdb');
 var url = require('url');
 var path = require('path');
@@ -106,7 +106,7 @@ function startServer() {
             'schema' : clientSchema
         });
         /*Create server*/
-        https.createServer(function (req, res) {
+        http.createServer(function (req, res) {
             switch(req.method) {
             case 'POST':
                 handlePostRequest(req, res);
